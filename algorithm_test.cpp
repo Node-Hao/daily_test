@@ -1957,5 +1957,27 @@ public:
         return;
     }
 };
+// 左叶子节点之和
+class Solution {
+public:
+    int sumOfLeftLeaves(TreeNode* root) 
+    {
+        int result = 0;
+        if (!root) return result;
+        dfs(root, result);
+        return result;
+    }
+    void dfs(TreeNode* cur, int& result)
+    {
+        if (!cur) return;
+        // 如果当前节点有左孩子，并且左孩子为叶子节点
+        if (cur->left && !cur->left->left && !cur->left->right)
+        {
+            result += cur->left->val;
+        }
+        dfs(cur->left, result);
+        dfs(cur->right, result);
+    }
+};
 
 
