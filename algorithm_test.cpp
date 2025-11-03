@@ -1979,5 +1979,31 @@ public:
         dfs(cur->right, result);
     }
 };
+// 找树左下角的值
+class Solution {
+public:
+    int findBottomLeftValue(TreeNode* root) {
+        // 记录当前最大深度
+        int maxDepth = 0;
+        // 初始值为根节点的值
+        int result = root->val;
 
+        // 当前节点，当前节点深度，最大深度，结果值
+        dfs(root, 1, maxDepth, result);
+        return result;
+    }
+    void dfs (TreeNode* cur, int currentPath, int& maxDepth, int& val)
+    {
+        if (!cur) return;
+        // 当前节点的深度大于最大深度，更新节点值，由于左边是先更新的，
+        // 不用担心同一深度的有节点被放进去
+        if (currentPath > maxDepth)
+        {
+            maxDepth = currentPath;
+            val = cur->val;
+        }
+        dfs(cur->left, currentPath + 1, maxDepth, val);
+        dfs(cur->right, currentPath + 1, maxDepth, val);
+    }
+};
 
