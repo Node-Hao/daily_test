@@ -2007,3 +2007,47 @@ public:
     }
 };
 
+/* 中序加后续构建二叉树 */
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        unordered_map<int, int> inorderMap;
+        // 为中序构建索引
+        for (int i = 0; i < inorder.size(); i++)
+        {
+            inorderMap[inorder[i]] = i;
+        }
+        return build(inorder, 0, inorder.size() - 1, 
+        postorder, 0, postorder.size() - 1, inorderMap);
+    }
+private:
+    TreeNode* build(vector<int>& inorder, int inLeft, int inRight, 
+    vector<int>& postorder, int pLeft, int pRight, unordered_map<int, int>& inorderMap)
+    {
+        // 左右节点越界相当于为空直接返回
+        if (inLeft > inRight || pLeft > pRight) return nullptr;
+
+        // 1.后续确定根节点
+        int rootVal = postorder[pRight];
+        TreeNode* root = new TreeNode(rootVal);
+
+        // 2.找到根节点在中序中的索引
+        int rootIndex = inorderMap[rootVal];
+        // 3.计算左子树的节点数
+        int leftNodeCounbt = rootIndex - inLeft;
+
+        // 递归构造左子树
+        // 中序左子树 【inLeft, rootIndex - 1】
+        // 后续左子树 【pLeft, pLeft + leftNodeCount - 1】
+        root->left = build(inorder, inLeft, rootIndex - 1, 
+                            postorder, pLeft, pLeft + leftNodeCounbt - 1, inorderMap);
+
+
+        // 递归构造右子树
+        // 中序右子树 【rootIndex + 1， inRight】
+        // 后续右子树 【pLeft + leftNodeCount, pRight - 1】(排除末尾的根节点)
+        root->right = build(inorder, rootIndex + 1, inRight, 
+                            postorder, pLeft + leftNodeCounbt, pRight - 1, inorderMap);
+        return root;
+    }
+};
