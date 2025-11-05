@@ -2051,3 +2051,45 @@ private:
         return root;
     }
 };
+// 最大二叉树
+class Solution {
+public:
+    TreeNode* constructMaximumBinaryTree(vector<int>& nums) {
+        unordered_map<int, int> tmap;
+        // 构建值与下标的索引
+        for (int i = 0; i < nums.size(); i++)
+        {
+            tmap[nums[i]] = i;
+        }
+        return construct(nums, 0, nums.size() - 1, tmap);
+    }
+
+    TreeNode* construct(vector<int>& nums, int Left, int Right, unordered_map<int, int>& tmap)
+    {
+        // 确定结束条件是什么?
+        if (Left > Right) return nullptr;
+
+        int maxVal = getMaxVal(nums, Left, Right);
+        TreeNode* root = new TreeNode(maxVal);
+        // 确定根节点索引
+        int rootIndex = tmap[maxVal];
+        // 确定左子树个数
+        int LeftNodeCounts = rootIndex - Left;
+
+        root->left = construct(nums, Left, rootIndex - 1, tmap);
+        root->right = construct(nums, rootIndex + 1, Right, tmap);
+        return root;
+    }
+    int getMaxVal(vector<int>& nums, int Left, int Right)
+    {
+        int max = nums[Left];
+        for (int i = Left; i <= Right; i++)
+        {
+            if (max < nums[i])
+            {
+                max = nums[i];
+            }
+        }
+        return max;
+    }
+};
