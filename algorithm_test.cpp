@@ -2107,3 +2107,47 @@ public:
         return root;
     }
 };
+// 二插搜索树中的搜索
+class Solution {
+public:
+    TreeNode* searchBST(TreeNode* root, int val) {
+        if (!root) return nullptr;
+        int rootVal = root->val;
+        if (rootVal > val) return searchBST(root->left, val);
+        if (rootVal < val) return searchBST(root->right, val);
+        if (rootVal == val) return root;
+        return nullptr;
+    }
+};
+// 验证二插搜索树，上下界版
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) 
+    {
+        return helper(root, LLONG_MIN, LLONG_MAX);
+    }
+    bool helper(TreeNode* root, long long lower, long long upper)
+    {
+        if (!root) return true;
+        int val = root->val;
+        // 1.当前节点值必须严格在上下界之间
+        if (val <= lower || val >= upper) return false;
+        return helper(root->left, lower, val) && helper(root->right, val, upper);
+    }
+};
+// 验证二插搜索树，中序变量递增版
+class Solution {
+public:
+    long long pre = LLONG_MIN;
+    bool isValidBST(TreeNode* root) {
+        if (!root) return true;
+        // 左子树
+        if (!isValidBST(root->left)) return false;
+        // 中序
+        if (root->val <= pre) return false;
+        // 更新前一个节点
+        pre = root->val;
+        return isValidBST(root->right);
+
+    }
+};
