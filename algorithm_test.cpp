@@ -2151,3 +2151,27 @@ public:
 
     }
 };
+// 二插搜索树的最小绝对值
+class Solution {
+public:
+    long long min_diff = LLONG_MAX;
+    long long prev = LLONG_MIN;
+    int getMinimumDifference(TreeNode* root) {
+        inorder(root);
+        return (int) min_diff;
+    }
+    void inorder(TreeNode* root)
+    {
+        if (!root) return;
+        // 左
+        inorder(root->left);
+        // 中: 计算当前节点与前驱节点的差值
+        if (prev != LLONG_MIN) // 跳过第一个节点无前驱
+        {
+            min_diff = min(min_diff, (long long)abs(root->val - prev));
+        }
+        prev = root->val;//更新前驱节点为当前节点
+        // 右
+        inorder(root->right);
+    }
+};
