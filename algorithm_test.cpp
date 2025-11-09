@@ -2175,3 +2175,48 @@ public:
         inorder(root->right);
     }
 };
+// 二插搜索树中的众数
+class Solution {
+public:
+    vector<int> findMode(TreeNode* root) {
+        vector<int> result;
+        long long prev = LLONG_MIN;
+        // 当前节点的频率
+        int currentCount = 0;
+        // 最大频率
+        int maxCount = 0;
+        helper(root, prev, currentCount, maxCount, result);
+        return result;
+    }
+    void helper(TreeNode* root, long long& prev, 
+                int& currentCount, int& maxCount, vector<int>& result)
+    {
+        if (!root) return;
+        // 左
+        helper(root->left, prev, currentCount, maxCount, result);
+        // 中
+        // 首先更新频率和prev
+        if (root->val == prev)
+        {
+            currentCount++;
+        }else{
+            // 不同值，频率置为1，更新prev
+            currentCount = 1;
+            prev = root->val;
+        }
+        // 其次维护众数集合
+        if (currentCount > maxCount)
+        {
+            maxCount = currentCount;
+            result.clear();
+            result.push_back(root->val);
+        }else if (currentCount == maxCount){
+            // 同样的最大频率加入结果
+            result.push_back(root->val);
+        }
+        // 右
+        helper(root->right, prev, currentCount, maxCount, result);
+    }
+    
+};
+// 没有重复利用到二插搜索树的性质，如果连续的话一定挨在一起
