@@ -2268,3 +2268,39 @@ public:
 };
 // 思路正确，大致框架正确
 // 1.没有考虑到回溯的逻辑，2.空返回包含叶子返回
+
+
+// 二插搜索树的最近公共祖先
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (p->val < root->val && q->val < root->val) {
+            // 都在左子树，递归左子树
+            return lowestCommonAncestor(root->left, p, q);
+        } else if (p->val > root->val && q->val > root->val) {
+            // 都在右子树，递归右子树
+            return lowestCommonAncestor(root->right, p, q);
+        } else {
+            // 分岔点或命中目标，返回当前节点
+            return root;
+        }
+    }
+};
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        while (root != nullptr)
+        {
+            if (p->val < root->val && q->val < root->val)
+            {
+                root = root->left;
+            }else if (p->val > root->val && q->val > root->val)
+            {
+                root = root->right;
+            }else {
+                return root;
+            }
+        }
+        return nullptr;
+    }
+};
