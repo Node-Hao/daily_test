@@ -2220,3 +2220,51 @@ public:
     
 };
 // 没有重复利用到二插搜索树的性质，如果连续的话一定挨在一起
+
+
+
+// 二叉树的最近公共祖先
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        stack<TreeNode*> pPath;
+        stack<TreeNode*> qPath;
+        helper(pPath, root, p);
+        helper(qPath, root, q);
+        // 此时得到了 s1 和 s2 记录的完整路径
+        // 不断出栈直到找到相同节点
+        while (qPath.size() != pPath.size())
+        {
+            if (qPath.size() > pPath.size())
+            {
+                qPath.pop();
+            }else{
+                pPath.pop();
+            }
+        }
+        // 同时出栈找到第一个公共节点
+        while (qPath.top() != pPath.top())
+        {
+            qPath.pop();
+            pPath.pop();
+        }
+        return qPath.top();
+    }
+
+    bool helper(stack<TreeNode*>& s, TreeNode* root, TreeNode* ad)
+    {
+        if (!root) return false;
+        s.push(root);
+       
+        // 找到对应元素直接返回路径
+        if (root == ad) return true;
+        bool leftTree =  helper(s, root->left, ad);
+        bool rightTree = helper(s, root->right, ad);
+        if (leftTree || rightTree) return true;
+        // 左右子树都没找到，当前节点不是目标路径的一部分，回溯弹出
+        s.pop();
+        return false;
+    }
+};
+// 思路正确，大致框架正确
+// 1.没有考虑到回溯的逻辑，2.空返回包含叶子返回
