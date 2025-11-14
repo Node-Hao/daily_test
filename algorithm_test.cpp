@@ -2304,3 +2304,268 @@ public:
         return nullptr;
     }
 };
+// 二插搜索树的插入操作
+// 自己手写版
+class Solution {
+public:
+    TreeNode* prev = nullptr;
+    TreeNode* insertIntoBST(TreeNode* root, int val) {
+        // 当节点为空时有两种情况
+        if (!root)
+        {
+            root = new TreeNode(val);
+            // 1.输入节点为空
+            if (!prev)
+            {
+                return root;
+            }else if (prev->val > val){
+                prev->left = root;
+            }else if (prev->val < val){
+                prev->right = root;
+            }
+        }
+        // 写出递归逻辑
+        if (val < root->val)
+        {
+            prev = root;
+            insertIntoBST(root->left, val);
+        }
+
+        if (val > root->val)
+        {
+            prev = root;
+            insertIntoBST(root->right, val);
+        }
+        return root;
+    }
+};
+// 改进版
+class Solution {
+public:
+    TreeNode* insertIntoBST(TreeNode* root, int val) {
+        if (!root)
+        {
+            return new TreeNode(val);
+        }
+
+        if (val < root->val)
+        {
+            root->left = insertIntoBST(root->left, val);
+        }else if (val > root->val)
+        {
+            root->right = insertIntoBST(root->right, val);
+        }
+
+        return root;
+    }
+};
+
+// 删除二叉树中的节点
+// 我的第一版做法
+class Solution {
+public:
+    TreeNode* deleteNode(TreeNode* root, int key) {
+        if (!root) return nullptr;
+        // 如果要删除的节点为根节点
+        if (root->val == key)
+        {
+            if (!root->left) return root->right;
+            if (!root->right) return root->left;
+            // 如果根节点左右子树均不为空, 那么替换节点就得为左子树的最右或右子树的最左
+            if (root->left->right)
+            {
+                // 如果左子树存在右节点
+                TreeNode* next = root->left->right;
+                root->left->right = root->right;
+                root->right->left = next;
+            }else{
+                // 如果不存在
+                root->left->right = root->right;
+            }
+            return root->left;
+        }
+        // 通过左右子树分别去找，只要有一侧完成任务就行
+        helper(root->left, key, root);
+        helper(root->right, key, root);
+        return root;
+    }
+
+    void helper(TreeNode* root, int key, TreeNode* prev)
+    {
+        if (!root) return;
+        // 如果找到了要删除的节点
+        if (root->val == key)
+        {
+            // 如果要删除节点在 prev 的左子树
+            if (prev->left && prev->left->val == key)
+            {
+                // 如果左子树有左孩子
+                if (root->left)
+                {
+                    prev->left = root->left;
+                    root->left->right = root->right;
+                }else {
+                // 如果没有左孩子
+                    prev->left = root->right;
+                }
+            }else if (prev->right && prev->right->val == key){
+            // 如果要删除节点在 prev 的右子树
+                // 如果右子树有左孩子
+                if (root->left)
+                {
+                    prev->right = root->left;
+                    root->left->right = root->right;
+                }else {
+                    // 如果没有左孩子
+                    prev->right = root->right;
+                }
+            }
+        }else{
+            // 如果没有找到，继续通过左右子树去找
+            helper(root->left, key, root);
+            helper(root->right, key, root);
+        }
+    }
+};
+// 首先记录prev节点很重要，而对于用左子节点做替换还是用右子节点做替换并不重要
+// 规定一个子节点做替换，并能连接如果存在另一个字节即可
+
+// 递归最右写法
+class Solution {
+public:
+    TreeNode* deleteNode(TreeNode* root, int key) {
+        if (!root) return nullptr;
+        // 如果要删除节点为当前节点
+        if (root->val == key)
+        {
+            // 如果左子树为空或右子树为空
+            if (!root->left) return root->right;
+            if (!root->right) return root->left;
+            // 如果左右子树均不为空，使用左子树的最右节点来替换
+            TreeNode* successor = findMostRight(root->left);
+            // 找到节点替换要删除节点
+            root->val = successor->val;
+            // 删除替换节点
+            root->left = deleteNode(root->left, successor->val);
+            return root;
+        }
+
+        // 如果没有找到要删除的节点就继续找
+        if (key < root->val){
+            root->left = deleteNode(root->left, key);
+        } else{
+            root->right = deleteNode(root->right, key);
+        }
+        return root;
+    }
+    TreeNode* findMostRight(TreeNode* root)
+    {
+        while (root->right)
+        {
+            root = root->right;
+        }
+        return root;
+    }
+};
+// 无论是第一个节点还是中间节点只要是要删除节点，就统一按左子树最右节点来替换
+
+// 修建二插搜索树
+// 我的第一版代码
+class Solution {
+public:
+    TreeNode* trimBST(TreeNode* root, int low, int high) {
+        if (!root) return nullptr;
+        vector<int> reuslt;//记录所有要删除的节点
+        dfs(root, low, high, reuslt);
+        for (int key : reuslt)
+        {
+            if (key == root->val)
+            {
+                root =  deleteNode(root, key);
+            }else if (key < root->val){
+                root->left = deleteNode(root->left, key);
+            }else {
+                root->right = deleteNode(root->right, key);
+            }
+        }
+        return root;
+    }
+    void dfs(TreeNode* root, int low, int high, vector<int>& reuslt)
+    {
+        if (!root) return;
+        if (root->val < low || root->val > high)
+        {
+            reuslt.push_back(root->val);
+        }
+        dfs(root->left, low, high, reuslt);
+        dfs(root->right, low, high, reuslt);
+    }
+
+    TreeNode* deleteNode(TreeNode* root, int key) {
+        if (!root) return nullptr;
+        // 如果要删除节点为当前节点
+        if (root->val == key)
+        {
+            // 如果左子树为空或右子树为空
+            if (!root->left) return root->right;
+            if (!root->right) return root->left;
+            // 如果左右子树均不为空，使用左子树的最右节点来替换
+            TreeNode* successor = findMostRight(root->left);
+            // 找到节点替换要删除节点
+            root->val = successor->val;
+            // 删除替换节点
+            root->left = deleteNode(root->left, successor->val);
+            return root;
+        }
+
+        // 如果没有找到要删除的节点就继续找
+        if (key < root->val){
+            root->left = deleteNode(root->left, key);
+        } else{
+            root->right = deleteNode(root->right, key);
+        }
+        return root;
+    }
+
+    TreeNode* findMostRight(TreeNode* root)
+    {
+        while (root->right)
+        {
+            root = root->right;
+        }
+        return root;
+    }
+};
+// 之所以错误是因为，修剪不同于删除，删除可以覆盖，但修建必须保持原有结构。
+
+// 递归最优版
+class Solution {
+public:
+    TreeNode* trimBST(TreeNode* root, int low, int high) {
+        // 递归终止：空树无需修剪
+        if (!root) return nullptr;
+
+        // 剪枝逻辑：利用BST有序性跳过无用子树
+        if (root->val < low) {
+            // 左子树全 < root->val < low，直接返回右子树的修剪结果
+            return trimBST(root->right, low, high);
+        }
+        if (root->val > high) {
+            // 右子树全 > root->val > high，直接返回左子树的修剪结果
+            return trimBST(root->left, low, high);
+        }
+
+        // 当前节点在范围内，递归修剪左右子树并挂载
+        root->left = trimBST(root->left, low, high);  // 修剪左子树
+        root->right = trimBST(root->right, low, high); // 修剪右子树
+        return root; // 返回保留的当前节点
+    }
+};
+
+
+
+
+
+
+
+
